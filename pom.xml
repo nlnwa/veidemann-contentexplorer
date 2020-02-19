@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.github.nlnwa</groupId>
+    <artifactId>veidemann-contentexplorer</artifactId>
+    <version>0</version>
+    <packaging>jar</packaging>
+
+    <organization>
+        <name>National Library of Norway</name>
+        <url>http://nb.no</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>oss.sonatype.org</id>
+            <name>OSS Sonatype</name>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+
+        <docker.username>${env.DOCKER_USERNAME}</docker.username>
+        <docker.password>${env.DOCKER_PASSWORD}</docker.password>
+        <docker.tag>${project.version}</docker.tag>
+
+        <org.jwat.version>1.1.1</org.jwat.version>
+        <org.glassfish.jersey.version>2.25.1</org.glassfish.jersey.version>
+
+        <veidemann.commons.version>0.4.1</veidemann.commons.version>
+        <veidemann.rethinkdbadapter.version>0.4.5</veidemann.rethinkdbadapter.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.nlnwa</groupId>
+            <artifactId>veidemann-rethinkdbadapter</artifactId>
+            <version>${veidemann.rethinkdbadapter.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.nlnwa</groupId>
+            <artifactId>veidemann-commons</artifactId>
+            <version>${veidemann.commons.version}</version>
+        </dependency>
+
+        <!-- Jersey -->
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-common</artifactId>
+            <version>${org.glassfish.jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-netty-http</artifactId>
+            <version>${org.glassfish.jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-grizzly2-http</artifactId>
+            <version>${org.glassfish.jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+            <version>${org.glassfish.jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.test-framework.providers</groupId>
+            <artifactId>jersey-test-framework-provider-inmemory</artifactId>
+            <version>${org.glassfish.jersey.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <!-- ARC/WARC libraries -->
+        <dependency>
+            <groupId>org.jwat</groupId>
+            <artifactId>jwat-common</artifactId>
+            <version>${org.jwat.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jwat</groupId>
+            <artifactId>jwat-gzip</artifactId>
+            <version>${org.jwat.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jwat</groupId>
+            <artifactId>jwat-arc</artifactId>
+            <version>${org.jwat.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jwat</groupId>
+            <artifactId>jwat-warc</artifactId>
+            <version>${org.jwat.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jwat</groupId>
+            <artifactId>jwat-archive</artifactId>
+            <version>${org.jwat.version}</version>
+        </dependency>
+
+        <!-- Configuration framework -->
+        <dependency>
+            <groupId>com.typesafe</groupId>
+            <artifactId>config</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.google.cloud.tools</groupId>
+                    <artifactId>jib-maven-plugin</artifactId>
+                    <version>2.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.0.0-M3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>2.7</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <!-- enforce Maven version >= 3.5 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>3.5</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Make version number available for application -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <configuration>
+                    <generateBackupPoms>false</generateBackupPoms>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <configuration>
+                    <to>
+                        <image>docker.io/norsknettarkiv/${project.artifactId}</image>
+                        <tags>
+                            <tag>${docker.tag}</tag>
+                        </tags>
+                        <auth>
+                            <username>${docker.username}</username>
+                            <password>${docker.password}</password>
+                        </auth>
+                    </to>
+                    <container>
+                        <ports>
+                            <port>8080</port>
+                            <port>9301</port>
+                        </ports>
+                        <volumes>
+                            <volume>/workdir</volume>
+                            <volume>/warcs</volume>
+                        </volumes>
+                        <environment>
+                            <WORK_DIR>/workdir</WORK_DIR>
+                            <WARC_DIR>/warcs</WARC_DIR>
+                        </environment>
+                        <jvmFlags>
+                            <jvmFlag>-Dfile.encoding=UTF-8</jvmFlag>
+                        </jvmFlags>
+                    </container>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>docker-build</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>dockerBuild</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>docker-build-and-push</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
